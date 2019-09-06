@@ -169,6 +169,7 @@
     </Compile>
     <Compile Include="Models\Agreement.cs" />
     <Compile Include="DBContext\AgreementDBInitializer.cs" />
+    <Compile Include="Models\AgreementSimulator.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\VilLibRate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

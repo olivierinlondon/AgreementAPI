@@ -3,9 +3,11 @@ using System.Net.Http;
 using System.Web.Http;
 
 using System.Data.Entity;
+using System.Linq;
 
 using AgreementAPI.Models;
 using AgreementAPI.DBContext;
+using System.Net;
 
 namespace AgreementAPI.Controllers
 {
@@ -20,36 +22,39 @@ namespace AgreementAPI.Controllers
         // GET api/<controller>/5
         public HttpResponseMessage Get(int id)
         {
-            foreach (var parameter in Request.GetQueryNameValuePairs())
-            {
-                var key = parameter.Key;
-                var value = parameter.Value;
-            }
-
-
-            VilLibRate.CallWebService();
-
-            Agreement ag1 = null;
+            Agreement refAgreement;
+            AgreementSimulator simAgreement; 
 
             using (var context = new AgreementContext())
-            {
-                var a = context.Agreements.Include(agr => agr.CustomerDetails);
 
-                foreach (Agreement ag in a)
+            {
+                var fullagreements = context.Agreements.Include(agr => agr.CustomerDetails).ToList();
+                refAgreement = fullagreements.FirstOrDefault(agr => agr.Id == id);
+
+            }
+
+            if (refAgreement != null)
+            {
+                if (Request.GetQueryNameValuePairs().Count() == 0)
+                    return new HttpResponseMessage()
+                    {
+                        Content = new ObjectContent<Agreement>(refAgreement,
+                          Configuration.Formatters.JsonFormatter)
+                    };
+                else
                 {
-                    ag1 = ag;
-                    string re = ag.CustomerDetails.FirstName;
+                    var valuepair = Request.GetQueryNameValuePairs().FirstOrDefault(a => a.Key == "SimulatedRate");
+
+                    if (Agreement.ValidBaseCodeRate(valuepair.Value))
+                        simAgreement = new AgreementSimulator(refAgreement,valuepair.Value);
                 }
 
             }
+            else
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Agreement not found");
 
-            Customer c = ag1.CustomerDetails;
-            
-            return new HttpResponseMessage()
-            {
-                Content = new ObjectContent<Agreement>(ag1,
-                          Configuration.Formatters.JsonFormatter)
-            };
+            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Agreement not found");
+
         }
 
         // POST api/<controller>

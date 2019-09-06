@@ -24,36 +24,39 @@ namespace AgreementAPI.DBContext
             };
             context.Customers.Add(c2);
 
-            Agreement ag1 = new Agreement(1.6)
+            Agreement ag1 = new Agreement()
             {
                 Id = 1,
                 CustomerDetails = c1,
                 Amount = 12000,
                 BaseCodeRate = "VILIBOR3m",
-                Duration = 60
+                Duration = 60,
+                Margin= 1.6
             };
 
             context.Agreements.Add(ag1);
 
 
-            ag1 = new Agreement(2.2)
+            ag1 = new Agreement()
             {
                 Id = 2,
                 CustomerDetails = c2,
                 Amount = 8000,
                 BaseCodeRate = "VILIBOR1y",
-                Duration = 36
+                Duration = 36,
+                Margin = 2.2
             };
 
             context.Agreements.Add(ag1);
 
-            ag1 = new Agreement(1.85)
+            ag1 = new Agreement()
             {
                 Id = 3,
                 CustomerDetails = c2,
                 Amount = 1000,
                 BaseCodeRate = "VILIBOR6m",
-                Duration = 24
+                Duration = 24,
+                Margin = 1.85
             };
 
             context.Agreements.Add(ag1);

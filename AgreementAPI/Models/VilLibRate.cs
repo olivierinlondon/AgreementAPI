@@ -9,12 +9,14 @@ namespace AgreementAPI.Models
     public class VilLibRate
     {
 
-        public static void CallWebService()
+        public static double GetCurrentRate(string baseCodeRate)
         {
+            double currentRate = 0;
+
             var _url = "http://www.lb.lt/webservices/VilibidVilibor/VilibidVilibor.asmx";
             var _action = "http://webservices.lb.lt/VilibidVilibor/getLatestVilibRate";
 
-            XmlDocument soapEnvelopeXml = CreateSoapEnvelope();
+            XmlDocument soapEnvelopeXml = CreateSoapEnvelope(baseCodeRate);
             HttpWebRequest webRequest = CreateWebRequest(_url, _action);
             InsertSoapEnvelopeIntoWebRequest(soapEnvelopeXml, webRequest);
 
@@ -33,12 +35,20 @@ namespace AgreementAPI.Models
                 {
                     soapResult = rd.ReadToEnd();
                 }
-                Console.Write(soapResult);
             }
 
             XmlDocument xml = new XmlDocument();
             xml.LoadXml(soapResult);
             XmlNodeList elemList = xml.GetElementsByTagName("getLatestVilibRateResult");
+
+            double newRate=0;
+            if (elemList.Count > 0)
+            {
+                if (Double.TryParse(elemList.Item(0).InnerXml, out newRate))
+                    currentRate = newRate;
+            }
+
+            return currentRate;
         }
 
         private static HttpWebRequest CreateWebRequest(string url, string action)
@@ -51,7 +61,7 @@ namespace AgreementAPI.Models
             return webRequest;
         }
 
-        private static XmlDocument CreateSoapEnvelope()
+        private static XmlDocument CreateSoapEnvelope(string baseCodeRate)
         {
             XmlDocument soapEnvelopeDocument = new XmlDocument();
 
@@ -59,7 +69,7 @@ namespace AgreementAPI.Models
             <soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">  
              <soap:Body>  
                 <getLatestVilibRate xmlns=""http://webservices.lb.lt/VilibidVilibor"">
-                    <RateType>VILIBOR1m</RateType>
+                    <RateType>"+ baseCodeRate + @"</RateType>
                  </getLatestVilibRate>
               </soap:Body>  
             </soap:Envelope>");
