@@ -46,7 +46,15 @@ namespace AgreementAPI.Controllers
                     var valuepair = Request.GetQueryNameValuePairs().FirstOrDefault(a => a.Key == "SimulatedRate");
 
                     if (Agreement.ValidBaseCodeRate(valuepair.Value))
+                    { 
                         simAgreement = new AgreementSimulator(refAgreement,valuepair.Value);
+                        return new HttpResponseMessage()
+                        {
+                            Content = new ObjectContent<AgreementSimulator>(simAgreement,
+                                    Configuration.Formatters.JsonFormatter)
+                        };
+                    }else
+                        return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Rate not found");
                 }
 
             }
