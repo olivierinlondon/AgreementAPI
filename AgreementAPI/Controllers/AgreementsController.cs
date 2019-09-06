@@ -8,6 +8,7 @@ using System.Linq;
 using AgreementAPI.Models;
 using AgreementAPI.DBContext;
 using System.Net;
+using Swashbuckle.Swagger.Annotations;
 
 namespace AgreementAPI.Controllers
 {
@@ -27,6 +28,8 @@ namespace AgreementAPI.Controllers
         /// <param name="id">The id of the agreement to be retrieved</param>
         /// <param name="simulatedRate">The new base rate code to simulate</param>
         /// <returns></returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(Agreement))]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(AgreementSimulator))]
         public HttpResponseMessage Get(int id, string simulatedRate="")
         {
             Agreement refAgreement;
@@ -53,7 +56,7 @@ namespace AgreementAPI.Controllers
                     if (Agreement.ValidBaseCodeRate(simulatedRate))
                     { 
                         simAgreement = new AgreementSimulator(refAgreement, simulatedRate);
-                        return new HttpResponseMessage()
+                        return new HttpResponseMessage(HttpStatusCode.Created)
                         {
                             Content = new ObjectContent<AgreementSimulator>(simAgreement,
                                     Configuration.Formatters.JsonFormatter)
