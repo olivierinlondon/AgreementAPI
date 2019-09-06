@@ -22,7 +22,7 @@ namespace AgreementAPI.Models
         }
 
         public long Id { get; set; }
-        public Customer Customer { get; set; }
+        public Customer CustomerDetails { get; set; }
         public long Amount { get; set; }
         public string BaseCodeRate { get; set; }
         public readonly double Margin;

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
+
+using System.Data.Entity;
 
 using AgreementAPI.Models;
 using AgreementAPI.DBContext;
@@ -19,21 +18,38 @@ namespace AgreementAPI.Controllers
         }
 
         // GET api/<controller>/5
-        public string Get(int id)
+        public HttpResponseMessage Get(int id)
         {
+            foreach (var parameter in Request.GetQueryNameValuePairs())
+            {
+                var key = parameter.Key;
+                var value = parameter.Value;
+            }
+
+
             VilLibRate.CallWebService();
+
+            Agreement ag1 = null;
 
             using (var context = new AgreementContext())
             {
+                var a = context.Agreements.Include(agr => agr.CustomerDetails);
 
-                foreach (Agreement ag in context.Agreements)
+                foreach (Agreement ag in a)
                 {
-                    string re = ag.BaseCodeRate;
+                    ag1 = ag;
+                    string re = ag.CustomerDetails.FirstName;
                 }
 
             }
 
-                return "agreement";
+            Customer c = ag1.CustomerDetails;
+            
+            return new HttpResponseMessage()
+            {
+                Content = new ObjectContent<Agreement>(ag1,
+                          Configuration.Formatters.JsonFormatter)
+            };
         }
 
         // POST api/<controller>
