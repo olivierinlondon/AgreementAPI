@@ -19,8 +19,15 @@ namespace AgreementAPI.Controllers
             return new string[] { "agreement", "agreement3" };
         }
 
-        // GET api/<controller>/5
-        public HttpResponseMessage Get(int id)
+
+        /// <summary>
+        /// Retrieves one agreement
+        /// --optional: simulate impact of new base rate
+        /// </summary>
+        /// <param name="id">The id of the agreement to be retrieved</param>
+        /// <param name="simulatedRate">The new base rate code to simulate</param>
+        /// <returns></returns>
+        public HttpResponseMessage Get(int id, string simulatedRate="")
         {
             Agreement refAgreement;
             AgreementSimulator simAgreement; 
@@ -43,11 +50,9 @@ namespace AgreementAPI.Controllers
                     };
                 else
                 {
-                    var valuepair = Request.GetQueryNameValuePairs().FirstOrDefault(a => a.Key == "SimulatedRate");
-
-                    if (Agreement.ValidBaseCodeRate(valuepair.Value))
+                    if (Agreement.ValidBaseCodeRate(simulatedRate))
                     { 
-                        simAgreement = new AgreementSimulator(refAgreement,valuepair.Value);
+                        simAgreement = new AgreementSimulator(refAgreement, simulatedRate);
                         return new HttpResponseMessage()
                         {
                             Content = new ObjectContent<AgreementSimulator>(simAgreement,
@@ -60,8 +65,6 @@ namespace AgreementAPI.Controllers
             }
             else
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Agreement not found");
-
-            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Agreement not found");
 
         }
 
